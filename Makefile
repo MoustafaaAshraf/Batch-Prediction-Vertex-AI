@@ -11,13 +11,15 @@ pre-commit: ## Run pre-commit
 	@ ${POETRY} run pre-commit run --all-files
 
 plan: ## Run terraform plan
-	@rm -rf .terraform && \
+	@cd terraform && \
+		rm -rf .terraform && \
 		terraform init && \
 		terraform plan \
 			-var-file=project_configuration/variables.tfvars.json \
 			-out=terraform.tfplan
 
 apply: ## Run terraform apply
-	@rm -rf .terraform && \
+	@cd terraform && \
+		rm -rf .terraform && \
 		terraform init && \
 		terraform apply terraform.tfplan

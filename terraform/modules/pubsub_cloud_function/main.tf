@@ -24,5 +24,3 @@ resource "google_cloudfunctions_function" "pubsub_function" {
     vpc_connector = var.vpc_connector
     vpc_connector_egress_settings = var.vpc_connector_egress_settings
 }
-
-
