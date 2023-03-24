@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "batch-pred"
+version = "0.1.0"
+description = "A batch prediction system using GCP"
+authors = ["Moustafa <mosafehashf@gmail.com>"]
+readme = "README.md"
+packages = [{include = "batch_pred"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.0"
+commitizen = "^2.42.1"
+black = "^23.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
