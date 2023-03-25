@@ -23,3 +23,10 @@ apply: ## Run terraform apply
 		rm -rf .terraform && \
 		terraform init && \
 		terraform apply terraform.tfplan
+
+build-image: ## Build docker image
+	@docker build -f "./containers/Dockerfile" --tag ${PIPELINE_IMAGE_NAME} .
+
+push-image: ## Push docker image
+	@docker build -f "./containers/Dockerfile" --tag ${PIPELINE_IMAGE_NAME} . && \
+		docker push ${PIPELINE_IMAGE_NAME}
