@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"pubsub_trigger_function","Source":"./modules/pubsub_cloud_function","Dir":"modules/pubsub_cloud_function"}]}
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"pubsub_scheduler","Source":"./modules/pubsub_scheduler","Dir":"modules/pubsub_scheduler"},{"Key":"pubsub_trigger","Source":"./modules/pubsub_trigger","Dir":"modules/pubsub_trigger"},{"Key":"pubsub_trigger.pubsub","Source":"registry.terraform.io/terraform-google-modules/pubsub/google","Version":"5.0.0","Dir":".terraform/modules/pubsub_trigger.pubsub"}]}

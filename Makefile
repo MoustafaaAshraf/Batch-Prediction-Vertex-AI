@@ -15,7 +15,7 @@ plan: ## Run terraform plan
 		rm -rf .terraform && \
 		terraform init && \
 		terraform plan \
-			-var-file=project_configuration/variables.tfvars.json \
+			-var-file=project_configuration/variables.auto.tfvars \
 			-out=terraform.tfplan
 
 apply: ## Run terraform apply
