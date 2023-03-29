@@ -26,10 +26,27 @@ module "pubsub_scheduler" {
     ]
 }
 
+resource "google_logging_metric" "fail_counter_metric" {
+    name = "${var.metric_prefix}-fail-counter-${var.name_suffix}"
+    project = var.project_id
+    filter = <<EOF
+        resource.type="aiplatform.googleapis.com/PipelineJob"
+        jsonPayload.pipelineName="${var.prediction_pipeline_name}"
+        jsonPayload.state="PIPELINE_STATE_FAILED"
+    EOF
+
+    metric_descriptor {
+        display_name = "Pipeline executions counter"
+        metric_kind = "DELTA"
+        value_type = "INT64"
+        unit = 1
+    }    
+}
+
 resource "google_monitoring_notification_channel" "email" {
     for_each = toset(var.notification_emails)
     project = var.project_id
-    display_name = "Email channel for ${each.value}"
+    display_name = "Email channel for ${each.key}"
     type = "email"
     labels = {
         email_address = each.key
@@ -44,7 +61,7 @@ resource "google_monitoring_alert_policy" "fail_alert_policy" {
     conditions {
         display_name = "Alert Failure (${var.alert_prefix}-fail-alert-policy)"
         condition_threshold {
-            filter = "resource.type = \"aiplatform.googleapis.com/PipelineJob\""
+            filter = "resource.type = \"aiplatform.googleapis.com/PipelineJob\" AND metric.type = \"logging.googleapis.com/user/${google_logging_metric.fail_counter_metric.name}\""
             duration = "0s"
             comparison = "COMPARISON_GT"
             threshold_value = 0.5

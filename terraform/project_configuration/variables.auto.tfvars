@@ -18,7 +18,7 @@ cloud_schedulers_config = {
     prediction = {
         name = "batch-preds-prediction-scheduler"
         description = "Scheduler for batch-preds prediction pipeline"
-        schedule = "0 0 * * 0"
+        schedule = "* * * * *"
         time_zone = "UTC"
         payload_file = "../src/pipelines/predictions/payloads/prediction.json"
     }

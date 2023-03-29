@@ -77,7 +77,7 @@ variable "cloud_run_config" {
         container_port = "8000"
         env_vars = {}
         image = "europe-west2-docker.pkg.dev/batch-preds/docker-repo/batch-prediction"
-        service_account = "terraform@batch_preds.iam.gserviceaccount.com"
+        service_account = "terraform@batch-preds.iam.gserviceaccount.com"
         vpc_connector = "cloud-functions-connector"
     }
 }
