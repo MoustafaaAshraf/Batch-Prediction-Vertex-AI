@@ -24,6 +24,13 @@ apply: ## Run terraform apply
 		terraform init && \
 		terraform apply terraform.tfplan
 
+destroy: ## Run terraform apply
+	@cd terraform && \
+		rm -rf .terraform && \
+		terraform init && \
+		terraform destroy \
+			-var-file=project_configuration/variables.auto.tfvars
+
 build-image: ## Build docker image
 	@docker build -f "./containers/Dockerfile" --tag ${PIPELINE_IMAGE_NAME} .
 
