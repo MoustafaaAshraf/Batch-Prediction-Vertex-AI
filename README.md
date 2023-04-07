@@ -42,6 +42,7 @@ Clone this repository to your local machine.
 ```sh
 git clone https://github.com/yourusername/gcp-batch-prediction-infrastructure.git
 cd gcp-batch-prediction-infrastructure
+```
 
 ### 2. Set up GCP and Service Account
 
@@ -50,6 +51,7 @@ Ensure you have a GCP account with billing enabled. Create a new GCP project or 
 ```sh
 gcloud projects create PROJECT_ID
 gcloud config set project PROJECT_ID
+```
 
 Create a service account with the necessary roles and download the JSON key:
 
@@ -57,7 +59,7 @@ Create a service account with the necessary roles and download the JSON key:
 gcloud iam service-accounts create terraform --display-name "Terraform Service Account"
 gcloud projects add-iam-policy-binding PROJECT_ID --member "serviceAccount:terraform@PROJECT_ID.iam.gserviceaccount.com" --role "roles/owner"
 gcloud iam service-accounts keys create terraform-key.json --iam-account terraform@PROJECT_ID.iam.gserviceaccount.com
-
+```
 
 ### 3. Install Dependencies
 
@@ -65,6 +67,7 @@ Install the Python dependencies using Poetry:
 
 ```sh
 poetry install
+```
 
 ### 4. Build and Push Custom Images
 
@@ -72,7 +75,7 @@ Log in to Google Container Registry:
 
 ```sh
 gcloud auth configure-docker
-
+```
 Build and push custom images to GCP Artifact Registry:
 
 docker build -t eu.gcr.io/PROJECT_ID/YOUR_IMAGE_NAME:YOUR_TAG -f Dockerfile .
