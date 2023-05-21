@@ -1,1 +1,1 @@
-from src.components.model.save_txt import save_txt
+from src.components.model.train import train_model

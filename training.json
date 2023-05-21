@@ -1,0 +1,94 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-bq-query-to-table": {
+        "executorLabel": "exec-bq-query-to-table",
+        "inputDefinitions": {
+          "parameters": {
+            "bq_client_project_id": {
+              "type": "STRING"
+            },
+            "destination_project_id": {
+              "type": "STRING"
+            },
+            "query": {
+              "type": "STRING"
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-bq-query-to-table": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "bq_query_to_table"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'google-cloud-bigquery==3.10.0' 'loguru==0.6.0' 'kfp==1.8.19' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef bq_query_to_table(\n    query: str,\n    bq_client_project_id: str,\n    destination_project_id: str,\n    # dataset_id: str = Optional[None],\n    # table_id: str = Optional[None],\n    # dataset_location: str = \"europe-west2\",\n    # query_job_config: dict = Optional[None],\n) -> None:\n    \"\"\"\n    Run query and create a new BQ table.\n\n    Args:\n        query (str): SQL query to execute, results are saved in a BQ table.\n        bq_client_project_id (str): Project ID that will be used by the BQ client.\n        destination_project_id (str): Project ID where BQ table will be created.\n        dataset_id (Optional[str], optional): Dataset ID where BQ table will be\n            created. Defaults to None.\n        table_id (Optional[str], optional): Table name (without project ID and\n            dataset ID) that will be created. Defaults to None.\n        dataset_location (str): BQ dataset location.\n        query_job_config (dict): Dict containing optional parameters required\n            by the bq query operation. No need to specify destination param.\n            Defaults to None.\n            See available parameters here\n            https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.job.QueryJobConfig.html\n    \"\"\"\n    from google.cloud import bigquery\n    from google.cloud.exceptions import GoogleCloudError\n    from loguru import logger\n\n    if query_job_config is None:\n        query_job_config = {}\n    if (dataset_id is not None) and (table_id is not None):\n        dest_table_ref = f\"{destination_project_id}.{dataset_id}.{table_id}\"\n    else:\n        dest_table_ref = None\n    job_config = bigquery.QueryJobConfig(destination=dest_table_ref, **query_job_config)\n\n    bq_client = bigquery.client.Client(\n        project=bq_client_project_id, location=dataset_location\n    )\n    query_job = bq_client.query(query, job_config=job_config)\n\n    try:\n        _ = query_job.result()\n        logger.info(f\"BQ table {dest_table_ref} created.\")\n    except GoogleCloudError as e:\n        logger.error(e)\n        logger.error(query_job.error_result)\n        logger.error(query_job.errors)\n        raise e\n\n"
+            ],
+            "image": "python:3.9"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "batch-preds-pipeline"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "bq-query-to-table": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-bq-query-to-table"
+            },
+            "inputs": {
+              "parameters": {
+                "bq_client_project_id": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "batch_pred"
+                    }
+                  }
+                },
+                "destination_project_id": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "batch_pred"
+                    }
+                  }
+                },
+                "query": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "SELECT pickup_longitude\n       , pickup_latitude\n       , dropoff_longitude\n       , dropoff_latitude\n       , passenger_count * 1.0 AS passenger_count\n       , CASE WHEN (fare_amount + tolls_amount) <= 15 THEN 1 ELSE 0 END AS fare_le_15\n\nFROM `nyc-tlc.yellow.trips`\n\nWHERE trip_distance > 0\nAND fare_amount >= 2.5\nAND pickup_longitude > -78\nAND pickup_longitude < -70\nAND dropoff_longitude > -78\nAND dropoff_longitude < -70\nAND pickup_latitude > 37\nAND pickup_latitude < 45\nAND dropoff_latitude > 37\nAND dropoff_latitude < 45\nAND passenger_count > 0\n\nAND pickup_datetime >= \"2022-01-01T00:00:00\"\n-- AND pickup_datetime <= \"2022-12-31T23:59:59\"\nAND pickup_datetime <= \"\"\n\nLIMIT 10\n;"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "bq-query-to-table"
+            }
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.19"
+  },
+  "runtimeConfig": {}
+}

@@ -2,7 +2,7 @@
 -include .env
 export
 
-POETRY := python -m poetry
+POETRY := poetry
 
 help: ## Display this help
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -39,7 +39,7 @@ push-image: ## Push docker image
 		docker push ${PIPELINE_IMAGE_NAME}
 
 compile: ## Compile Pipeline
-	@ ${POETRY} run python -m src.pipelines.predictions.pipeline
+	@ ${POETRY} run python -m src.pipelines.training.pipeline
 
 run: ## Run Pipeline
-	@ ${POETRY} run python -m src.trigger.main --payload=./src/pipelines/predictions/payloads/prediction.json
+	@ ${POETRY} run python -m src.trigger.main --payload=./src/pipelines/training/payloads/training.json
