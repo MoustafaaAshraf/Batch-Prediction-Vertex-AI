@@ -74,7 +74,7 @@ variable "cloud_run_config" {
     default = {
         args = [ "src.trigger.app:app", "--config=./src/trigger/config.py" ]
         command = [ "gunicorn" ]
-        container_port = "8000"
+        container_port = "8080"
         env_vars = {}
         image = "europe-west2-docker.pkg.dev/batch-preds/docker-repo/batch-prediction"
         service_account = "terraform@batch-preds.iam.gserviceaccount.com"

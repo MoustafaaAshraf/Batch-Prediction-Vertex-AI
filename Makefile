@@ -37,3 +37,9 @@ build-image: ## Build docker image
 push-image: ## Push docker image
 	@docker build -f "./containers/Dockerfile" --tag ${PIPELINE_IMAGE_NAME} . && \
 		docker push ${PIPELINE_IMAGE_NAME}
+
+compile: ## Compile Pipeline
+	@ ${POETRY} run python -m src.pipelines.predictions.pipeline
+
+run: ## Run Pipeline
+	@ ${POETRY} run python -m src.trigger.main --payload=./src/pipelines/predictions/payloads/prediction.json

@@ -1,32 +1,8 @@
 {
     "attributes": {
-        "name": "test",
-        "description": "test",
-        "type": "test",
-        "url": "test",
-        "created": "2017-03-01T00:00:00.000Z",
-        "updated": "2017-03-01T00:00:00.000Z",
-        "id": "test"
+        "enable_caching": "False",
+        "template_path": "prediction.json"
     },
     "data": {
-        "type": "test",
-        "id": "test",
-        "attributes": {
-            "name": "test",
-            "description": "test",
-            "type": "test",
-            "url": "test",
-            "created": "2017-03-01T00:00:00.000Z",
-            "updated": "2017-03-01T00:00:00.000Z",
-            "id": "test"
-        },
-        "relationships": {
-            "test": {
-                "data": {
-                    "type": "test",
-                    "id": "test"
-                }
-            }
-        }
     }
 }
