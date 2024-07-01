@@ -1,5 +1,6 @@
 FROM python:3.10.0-slim-bullseye
 
+# Set environment variables for Python
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1 \

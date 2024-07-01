@@ -1,24 +1,27 @@
 from kfp.v2 import compiler, dsl
 from src.pipelines import generate_query
-# from src.components.model import save_txt
-from src.components.bigquery import bq_query_to_table
 import pathlib
+from google_cloud_pipeline_components.v1.bigquery import BigqueryQueryJobOp
+from google_cloud_pipeline_components.experimental.custom_job.utils import create_custom_training_job_op_from_component
+from src.components.model.train import train_model
 
 @dsl.pipeline(name='batch-preds-pipeline', description='training Pipeline')
 def training_pipeline():
     
-    queries_folder = pathlib.Path(__file__).parent / "queries"
+    # queries_folder = pathlib.Path(__file__).parent / "queries"
     
-    ingest_query = generate_query(
-        queries_folder / "training_query.sql",
-    )
+    # ingest_query = generate_query(
+    #     queries_folder / "training_query.sql",
+    # )
     
-    # Component 1: Save dummy txt to GCS
-    first_op = bq_query_to_table(
-        query=ingest_query,
-        bq_client_project_id='batch_pred',
-        destination_project_id='batch_pred'
-    )
+    # query_op = BigqueryQueryJobOp(
+    #     project='batch-preds-387415',
+    #     location='us-central1',
+    #     # query=ingest_query
+    #     query='SELECT 1+2 AS Result'
+    # )
+    
+    train_model()
     
     
     

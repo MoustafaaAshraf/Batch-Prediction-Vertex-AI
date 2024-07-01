@@ -58,7 +58,7 @@ def trigger_pipeline(
         pipeline_root=pipeline_root,
         parameter_values=parameter_values,
         enable_caching=False,
-        project='batch-preds',
+        project=project_id,
         # project_id='batch-preds',
         location=location,
         # service_account=service_account,

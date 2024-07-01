@@ -1,0 +1,80 @@
+name: Train model
+description: _summary_
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - |2
+
+      if ! [ -x "$(command -v pip)" ]; then
+          python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip
+      fi
+
+      PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'loguru==0.6.0' 'scikit-learn==1.2.2' 'pandas==2.0.1' 'google-cloud-aiplatform' 'kfp==1.8.19' && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp -d)
+      printf "%s" "$0" > "$program_path/ephemeral_component.py"
+      python3 -m kfp.v2.components.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+    - |2+
+
+      import kfp
+      from kfp.v2 import dsl
+      from kfp.v2.dsl import *
+      from typing import *
+
+      def train_model(
+          # training_data: Input[Dataset],
+          # target_column: str,
+          # model_params: dict,
+          # model: Output[Model],
+      ) -> None:
+          """_summary_
+
+          Args:
+              training_data (Input[Dataset]): _description_
+              target_column (str): _description_
+              model_params (dict): _description_
+              model (Output[Model]): _description_
+          """
+          import joblib
+          import pandas as pd
+          from sklearn.tree import DecisionTreeClassifier
+
+          df_train = pd.read_csv(training_data.path)
+          y = df_train.pop(target_column)
+
+          dtc = DecisionTreeClassifier(**model_params)
+          dtc.fit(X=df_train, y=y)
+
+          model_path = model.uri + "/model.joblib"
+          joblib.dump(dtc, model_path)
+
+          training_job = aiplatform.CustomJob(
+              display_name="train-job",
+              job_spec={
+                  "worker_pool_specs": [
+                      {
+                          "machine_spec": {
+                              "machine_type": "n1-standard-4",  # This specifies 4 vCPUs
+                          },
+                          "replica_count": 1,
+                          "container_spec": {
+                              # Container spec goes here
+                          },
+                      }
+                  ]
+              },
+          )
+
+          # Start the training job
+          training_job.run(sync=False)
+
+    args:
+    - --executor_input
+    - {executorInput: null}
+    - --function_to_execute
+    - train_model
